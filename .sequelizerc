@@ -1,0 +1,8 @@
+const path = require("path");
+
+module.exports = {
+  "config": path.resolve("./dbSchema/config", "postgresConfig.js"),
+  "models-path": path.resolve("./dbSchema/models"),
+  "seeders-path": path.resolve("./dbSchema/seeders"),
+  "migrations-path": path.resolve("./dbSchema/migrations"),
+};
