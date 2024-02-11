@@ -18,3 +18,8 @@ module.exports.authSchema = yup.object().shape({
       "Invalid homePage format"
     ),
 });
+
+module.exports.postComment = yup.object().shape({
+  parentCommentId: yup.number(),
+  content: yup.string().required().matches(/.+/i, "Invalid text format"),
+});
