@@ -6,7 +6,11 @@ const checkToken = require("../middleware/checkToken");
 
 const authRouter = Router();
 
-authRouter.post("/registration", controllers.registrationUser);
+authRouter.post(
+  "/registration",
+  validators.validateAuthorization,
+  controllers.registrationUser
+);
 
 authRouter.post("/login", validators.validateAuthorization, controllers.login);
 
