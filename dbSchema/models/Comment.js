@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "parentCommentId",
         allowNull: true,
       });
-      models.Comment.hasMany(Comment, {
+      Comment.hasMany(models.Comment, {
         as: "replies",
         foreignKey: "parentCommentId",
         targetKey: "commentId",

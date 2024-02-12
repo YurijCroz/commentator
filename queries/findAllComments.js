@@ -1,6 +1,7 @@
 "use strict";
 const { Comment, User } = require("../dbSchema/models");
 const ServerError = require("../errors/ServerError");
+const UserNotFoundError = require("../errors/UserNotFoundError");
 
 const commentAtt = [
   "commentId",
@@ -40,8 +41,12 @@ module.exports.findAllComments = async (
       ],
     });
 
+    if (!parentCommentId && !comments.length) {
+      throw new UserNotFoundError("No comments found");
+    }
+
     return comments.map((comment) => comment.get({ plain: true }));
   } catch (error) {
-    throw new ServerError();
+    throw new ServerError(error.message);
   }
 };

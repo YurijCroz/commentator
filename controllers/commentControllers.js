@@ -1,4 +1,5 @@
 "use strict";
+const { sequelize } = require("../dbSchema/models");
 const { findAllComments } = require("../queries/findAllComments");
 const { addComment } = require("../queries/addComment");
 const ServerError = require("../errors/ServerError");
@@ -25,9 +26,11 @@ module.exports.getComments = async (req, res, next) => {
   try {
     const sort = req.query.sort || "createdAt";
     const sortDirect = req.query.sortDirect || "DESC";
+    const page = +req.query.page || 1;
+    const limit = +req.query.limit || 25;
     const options = {
-      limit: req.query.limit || 25,
-      offset: req.query.offset || 0,
+      limit,
+      offset: (page - 1) * limit,
       order: [[sort, sortDirect]],
     };
 
@@ -41,7 +44,15 @@ module.exports.getComments = async (req, res, next) => {
       }
     }
 
-    res.status(200).send(comments);
+    const [totalCountQuery] = await sequelize.query(
+      'SELECT COUNT(*) AS total_count FROM "Comments" WHERE "parentCommentId" IS NULL;',
+      { type: sequelize.QueryTypes.SELECT }
+    );
+    const count = +totalCountQuery.total_count;
+
+    const totalPages = Math.ceil(count / options.limit);
+
+    res.status(200).send({ totalPages, comments });
   } catch (error) {
     next(error);
   }

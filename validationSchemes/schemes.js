@@ -26,7 +26,7 @@ module.exports.postComment = yup.object().shape({
 
 module.exports.getComments = yup.object().shape({
   limit: yup.number().positive(),
-  offset: yup.number().min(0),
+  page: yup.number().min(0),
   sort: yup.string().oneOf(["email", "userName", "createdAt"]),
   sortDirect: yup.string().oneOf(["ASC", "DESC"]),
 });
