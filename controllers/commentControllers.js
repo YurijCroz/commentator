@@ -3,6 +3,10 @@ const { sequelize } = require("../dbSchema/models");
 const { findAllComments } = require("../queries/findAllComments");
 const { addComment } = require("../queries/addComment");
 const ServerError = require("../errors/ServerError");
+const cache = require("../config/cacheConfig");
+const CONSTANTS = require("../constants");
+const { COMMENTS_AND_TOTAL_PAGE_CACHE, DEFAULT_SORT_BY, DEFAULT_SORT_DIRECT } =
+  CONSTANTS;
 
 const recursiveGetComments = async (reply) => {
   try {
@@ -22,18 +26,8 @@ const recursiveGetComments = async (reply) => {
   }
 };
 
-module.exports.getComments = async (req, res, next) => {
+const getCommentsAndTotalPage = async (options) => {
   try {
-    const sort = req.query.sort || "createdAt";
-    const sortDirect = req.query.sortDirect || "DESC";
-    const page = +req.query.page || 1;
-    const limit = +req.query.limit || 25;
-    const options = {
-      limit,
-      offset: (page - 1) * limit,
-      order: [[sort, sortDirect]],
-    };
-
     const comments = await findAllComments(null, options);
 
     for (const comment of comments) {
@@ -52,7 +46,46 @@ module.exports.getComments = async (req, res, next) => {
 
     const totalPages = Math.ceil(count / options.limit);
 
-    res.status(200).send({ totalPages, comments });
+    return [totalPages, comments];
+  } catch (error) {
+    throw new ServerError();
+  }
+};
+
+module.exports.getComments = async (req, res, next) => {
+  try {
+    const sort = req.query.sort || DEFAULT_SORT_BY;
+    const sortDirect = req.query.sortDirect || DEFAULT_SORT_DIRECT;
+    const page = +req.query.page || 1;
+    const limit = +req.query.limit || 25;
+    const options = {
+      limit,
+      offset: (page - 1) * limit,
+      order: [[sort, sortDirect]],
+    };
+
+    const isDefaultParams =
+      sort === DEFAULT_SORT_BY &&
+      sortDirect === DEFAULT_SORT_DIRECT &&
+      page === 1 &&
+      limit === 25;
+
+    const cacheSendData = cache.get(COMMENTS_AND_TOTAL_PAGE_CACHE);
+
+    if (isDefaultParams && cacheSendData) {
+      res.status(200).send(cacheSendData);
+    } else {
+      const [totalPages, comments] = await getCommentsAndTotalPage(options);
+
+      if (isDefaultParams) {
+        cache.set(COMMENTS_AND_TOTAL_PAGE_CACHE, {
+          totalPages,
+          comments,
+        });
+      }
+
+      res.status(200).send({ totalPages, comments });
+    }
   } catch (error) {
     next(error);
   }
@@ -71,6 +104,19 @@ module.exports.createComment = async (req, res, next) => {
     };
 
     const comment = await addComment(body);
+
+    if (comment) {
+      const options = {
+        limit: 25,
+        offset: 0,
+        order: [[DEFAULT_SORT_BY, DEFAULT_SORT_DIRECT]],
+      };
+      const [totalPages, comments] = await getCommentsAndTotalPage(options);
+      cache.set(COMMENTS_AND_TOTAL_PAGE_CACHE, {
+        totalPages,
+        comments,
+      });
+    }
 
     res.status(200).send(comment);
   } catch (error) {

@@ -2,6 +2,8 @@
 const { Comment, User } = require("../dbSchema/models");
 const ServerError = require("../errors/ServerError");
 const UserNotFoundError = require("../errors/UserNotFoundError");
+const CONSTANTS = require("../constants");
+const { DEFAULT_SORT_BY, DEFAULT_SORT_DIRECT } = CONSTANTS;
 
 const commentAtt = [
   "commentId",
@@ -11,7 +13,7 @@ const commentAtt = [
   "createdAt",
 ];
 
-const order = [["createdAt", "DESC"]];
+const order = [[DEFAULT_SORT_BY, DEFAULT_SORT_DIRECT]];
 
 const userModel = {
   model: User,
