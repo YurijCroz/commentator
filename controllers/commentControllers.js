@@ -23,11 +23,11 @@ const recursiveGetComments = async (reply) => {
 
 module.exports.getComments = async (req, res, next) => {
   try {
-    const sort = "createdAt";
-    const sortDirect = "DESC";
+    const sort = req.query.sort || "createdAt";
+    const sortDirect = req.query.sortDirect || "DESC";
     const options = {
-      limit: 25,
-      offset: 0,
+      limit: req.query.limit || 25,
+      offset: req.query.offset || 0,
       order: [[sort, sortDirect]],
     };
 

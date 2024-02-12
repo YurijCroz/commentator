@@ -23,3 +23,14 @@ module.exports.validatePostComment = async (req, res, next) => {
     return next(new BadRequestError(error.errors));
   }
 };
+
+module.exports.validateGetComments = async (req, res, next) => {
+  try {
+    await schemes.getComments.validate(req.query, {
+      abortEarly: false,
+    });
+    next();
+  } catch (error) {
+    return next(new BadRequestError(error.errors));
+  }
+};

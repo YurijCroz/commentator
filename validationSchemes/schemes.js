@@ -23,3 +23,10 @@ module.exports.postComment = yup.object().shape({
   parentCommentId: yup.number(),
   content: yup.string().required().matches(/.+/i, "Invalid text format"),
 });
+
+module.exports.getComments = yup.object().shape({
+  limit: yup.number().positive(),
+  offset: yup.number().min(0),
+  sort: yup.string().oneOf(["email", "userName", "createdAt"]),
+  sortDirect: yup.string().oneOf(["ASC", "DESC"]),
+});

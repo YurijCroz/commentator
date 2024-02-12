@@ -7,7 +7,11 @@ const { uploadFile } = require("../utils/fileUpload");
 
 const commentRouter = Router();
 
-commentRouter.get("/getComments", controllers.getComments);
+commentRouter.get(
+  "/getComments",
+  validators.validateGetComments,
+  controllers.getComments
+);
 
 commentRouter.post(
   "/comment",
