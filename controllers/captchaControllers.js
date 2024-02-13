@@ -2,9 +2,11 @@
 const randomstring = require("randomstring");
 const { createCanvas } = require("canvas");
 
+const lengthCaptcha = +process.env.LENGTH_CAPTCHA || 3;
+
 const generateCaptcha = () => {
   return randomstring.generate({
-    length: 3,
+    length: lengthCaptcha,
     charset: "alphanumeric",
   });
 };
