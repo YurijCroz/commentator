@@ -21,7 +21,7 @@ module.exports.authSchema = yup.object().shape({
 
 module.exports.postComment = yup.object().shape({
   parentCommentId: yup.number(),
-  content: yup.string().required().matches(/.+/i, "Invalid text format"),
+  content: yup.string().required().matches(/[^ ]+/i, "Invalid text format"),
 });
 
 module.exports.getComments = yup.object().shape({
