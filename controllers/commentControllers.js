@@ -22,7 +22,9 @@ const recursiveGetComments = async (reply) => {
 
     return nextReplies;
   } catch (error) {
-    throw new ServerError();
+    throw error.name && error.message && error.code
+      ? error
+      : new ServerError(error);
   }
 };
 
@@ -48,7 +50,9 @@ const getCommentsAndTotalPage = async ({ order, ...options }) => {
 
     return [totalPages, comments];
   } catch (error) {
-    throw new ServerError();
+    throw error.name && error.message && error.code
+      ? error
+      : new ServerError(error);
   }
 };
 

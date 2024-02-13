@@ -57,6 +57,6 @@ module.exports.findAllComments = async (
 
     return comments.map((comment) => comment.get({ plain: true }));
   } catch (error) {
-    throw new ServerError(error.message);
+    throw error;
   }
 };
