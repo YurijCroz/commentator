@@ -1,9 +1,10 @@
 "use strict";
-const { Comment, User } = require("../dbSchema/models");
+const { Comment, User, Sequelize } = require("../dbSchema/models");
 const ServerError = require("../errors/ServerError");
 const UserNotFoundError = require("../errors/UserNotFoundError");
 const CONSTANTS = require("../constants");
 const { DEFAULT_SORT_BY, DEFAULT_SORT_DIRECT } = CONSTANTS;
+const { literal } = Sequelize;
 
 const commentAtt = [
   "commentId",
@@ -13,18 +14,24 @@ const commentAtt = [
   "createdAt",
 ];
 
-const order = [[DEFAULT_SORT_BY, DEFAULT_SORT_DIRECT]];
+const defaultOrder = { sort: DEFAULT_SORT_BY, sortDirect: DEFAULT_SORT_DIRECT };
 
 const userModel = {
   model: User,
   as: "user",
-  attributes: ["userId", "userName", "email", "homePage"],
+  attributes: ["userName", "email", "homePage"],
 };
 
 module.exports.findAllComments = async (
   parentCommentId,
-  options = { order }
+  options,
+  { sort, sortDirect } = defaultOrder
 ) => {
+  const currentOrder =
+    sort !== DEFAULT_SORT_BY
+      ? [literal(`"user"."${sort}"`), sortDirect]
+      : [[sort, sortDirect]];
+
   try {
     const comments = await Comment.findAll({
       attributes: commentAtt,
@@ -37,10 +44,11 @@ module.exports.findAllComments = async (
           as: "replies",
           attributes: commentAtt,
           required: false,
-          order,
           include: userModel,
         },
       ],
+      order: [currentOrder, [literal('"replies"."createdAt"'), "DESC"]],
+      subQuery: false,
     });
 
     if (!parentCommentId && !comments.length) {

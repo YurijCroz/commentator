@@ -26,9 +26,9 @@ const recursiveGetComments = async (reply) => {
   }
 };
 
-const getCommentsAndTotalPage = async (options) => {
+const getCommentsAndTotalPage = async ({ order, ...options }) => {
   try {
-    const comments = await findAllComments(null, options);
+    const comments = await findAllComments(null, options, order);
 
     for (const comment of comments) {
       if (comment.replies.length) {
@@ -61,7 +61,7 @@ module.exports.getComments = async (req, res, next) => {
     const options = {
       limit,
       offset: (page - 1) * limit,
-      order: [[sort, sortDirect]],
+      order: { sort, sortDirect },
     };
 
     const isDefaultParams =
