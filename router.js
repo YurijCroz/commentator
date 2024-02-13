@@ -9,4 +9,7 @@ router.use("/auth", authRouter);
 const commentRouter = require("./routes/commentRouter");
 router.use("/comments", commentRouter);
 
+const captchaRouter = require("./routes/captchaRouter");
+router.use("/captcha", captchaRouter);
+
 module.exports = router;
