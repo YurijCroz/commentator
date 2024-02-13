@@ -109,7 +109,7 @@ module.exports.createComment = async (req, res, next) => {
       const options = {
         limit: 25,
         offset: 0,
-        order: [[DEFAULT_SORT_BY, DEFAULT_SORT_DIRECT]],
+        order: { sort: DEFAULT_SORT_BY, sortDirect: DEFAULT_SORT_DIRECT },
       };
       const [totalPages, comments] = await getCommentsAndTotalPage(options);
       cache.set(COMMENTS_AND_TOTAL_PAGE_CACHE, {
