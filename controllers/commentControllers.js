@@ -5,6 +5,7 @@ const { addComment } = require("../queries/addComment");
 const ServerError = require("../errors/ServerError");
 const cache = require("../config/cacheConfig");
 const CONSTANTS = require("../constants");
+const websocket = require("../socketInit");
 const { COMMENTS_AND_TOTAL_PAGE_CACHE, DEFAULT_SORT_BY, DEFAULT_SORT_DIRECT } =
   CONSTANTS;
 
@@ -120,6 +121,8 @@ module.exports.createComment = async (req, res, next) => {
         totalPages,
         comments,
       });
+
+      websocket.getNotificationController().emitNewComment([], comment);
     }
 
     res.status(200).send(comment);
