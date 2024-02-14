@@ -122,10 +122,15 @@ module.exports.createComment = async (req, res, next) => {
         comments,
       });
 
-      websocket.getNotificationController().emitNewComment([], comment);
-    }
+      const { userName, email, homePage } = req.tokenData;
 
-    res.status(200).send(comment);
+      comment.user = { userName, email, homePage };
+      delete comment.userId;
+
+      websocket.getNotificationController().emitNewComment([], comment);
+
+      res.status(200).send(comment);
+    }
   } catch (error) {
     next(error);
   }

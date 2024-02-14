@@ -8,7 +8,7 @@ class NotificationSocket extends WebSocket {
   }
 
   emitNewComment(target, msg) {
-    this.io.to(target).emit("comment", { msg });
+    this.io.to(target).emit("comment", { ...msg });
   }
 
   onSubscribe(socket) {

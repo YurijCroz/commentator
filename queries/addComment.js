@@ -1,5 +1,5 @@
 "use strict";
-const { Sequelize, Comment } = require("../dbSchema/models");
+const { Comment } = require("../dbSchema/models");
 const ServerError = require("../errors/ServerError");
 
 module.exports.addComment = async (body) => {
@@ -8,7 +8,7 @@ module.exports.addComment = async (body) => {
       ...body,
     });
 
-    return comment;
+    return comment.get({ plain: true });
   } catch (error) {
     throw new ServerError();
   }
