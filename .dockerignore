@@ -1,0 +1,12 @@
+.idea/
+.vscode/
+node_modules/
+uploadFiles/
+log/
+yarn.lock
+
+.gitignore
+.git
+
+upload/
+public/
