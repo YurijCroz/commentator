@@ -5,6 +5,7 @@ const validators = require("../middleware/validators");
 const validateContentMsg = require("../middleware/checkStringDOM");
 const { checkToken } = require("../middleware/checkToken");
 const { uploadFile } = require("../utils/fileUpload");
+const checkCaptcha = require("../middleware/checkCaptcha");
 
 const commentRouter = Router();
 
@@ -18,6 +19,7 @@ commentRouter.post(
   "/comment",
   checkToken,
   uploadFile,
+  checkCaptcha,
   validators.validatePostComment,
   validateContentMsg,
   controllers.createComment
