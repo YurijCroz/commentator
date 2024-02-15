@@ -8,7 +8,7 @@ const authRouter = Router();
 
 authRouter.post(
   "/registration",
-  validators.validateAuthorization,
+  validators.validateRegistration,
   controllers.registrationUser
 );
 
