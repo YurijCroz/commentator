@@ -1,6 +1,5 @@
 "use strict";
 const { Comment, User, Sequelize } = require("../dbSchema/models");
-const ServerError = require("../errors/ServerError");
 const UserNotFoundError = require("../errors/UserNotFoundError");
 const CONSTANTS = require("../constants");
 const { DEFAULT_SORT_BY, DEFAULT_SORT_DIRECT } = CONSTANTS;
@@ -22,6 +21,14 @@ const userModel = {
   attributes: ["userName", "email", "homePage"],
 };
 
+const repliesModel = {
+  model: Comment,
+  as: "replies",
+  attributes: commentAtt,
+  required: false,
+  include: userModel,
+};
+
 module.exports.findAllComments = async (
   parentCommentId,
   options,
@@ -30,24 +37,23 @@ module.exports.findAllComments = async (
   const currentOrder =
     sort !== DEFAULT_SORT_BY
       ? [literal(`"user"."${sort}"`), sortDirect]
-      : [[sort, sortDirect]];
+      : [sort, sortDirect];
+
+  const include = parentCommentId
+    ? [{ ...userModel }, { ...repliesModel }]
+    : [{ ...userModel }];
+
+  const order = parentCommentId
+    ? [currentOrder, [literal('"replies"."createdAt"'), "DESC"]]
+    : [currentOrder];
 
   try {
     const comments = await Comment.findAll({
       attributes: commentAtt,
       where: { parentCommentId },
       ...options,
-      include: [
-        { ...userModel },
-        {
-          model: Comment,
-          as: "replies",
-          attributes: commentAtt,
-          required: false,
-          include: userModel,
-        },
-      ],
-      order: [currentOrder, [literal('"replies"."createdAt"'), "DESC"]],
+      include,
+      order,
       subQuery: false,
     });
 

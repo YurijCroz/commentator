@@ -34,11 +34,7 @@ const getCommentsAndTotalPage = async ({ order, ...options }) => {
     const comments = await findAllComments(null, options, order);
 
     for (const comment of comments) {
-      if (comment.replies.length) {
-        for (const reply of comment.replies) {
-          reply.replies = await recursiveGetComments(reply);
-        }
-      }
+      comment.replies = await recursiveGetComments(comment);
     }
 
     const [totalCountQuery] = await sequelize.query(
