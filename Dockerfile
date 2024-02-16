@@ -1,5 +1,7 @@
 FROM node:16-alpine3.14
 
+RUN apk add --no-cache python3 make g++ cairo-dev jpeg-dev pango-dev giflib-dev pkgconfig libjpeg-turbo-dev ttf-freefont
+
 RUN mkdir /server
 
 WORKDIR /server
